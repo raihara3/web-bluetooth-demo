@@ -10,12 +10,14 @@
     "webpack": "webpack --config webpack.config.js --mode development",
     "start": "run-p webpack build-scss watch-scss webpackdevserver",
     "precommit": "yarn run eslint .eslintrc",
-    "webpackdevserver": "webpack-dev-server"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "precommit"
-    }
+    "webpackdevserver": "webpack-dev-server --https",
+    "create-ssl-certificate": "run-s create-ca-privatekey create-ca-csr create-ca-crt create-server-privatekey create-server-csr create-server-crt",
+    "create-ca-privatekey": "openssl genrsa -out ca-privatekey.pem 2048",
+    "create-ca-csr": "openssl req -new -key ca-privatekey.pem -out ca-csr.pem",
+    "create-ca-crt": "openssl req -x509 -key ca-privatekey.pem -in ca-csr.pem -out ca-crt.pem -days 3560",
+    "create-server-privatekey": "openssl genrsa -out server-privatekey.pem",
+    "create-server-csr": "openssl req -new -key server-privatekey.pem -out server-csr.pem",
+    "create-server-crt": "openssl x509 -req -CA ca-crt.pem -CAkey ca-privatekey.pem -CAcreateserial -in server-csr.pem -out server-crt.pem -days 3650"
   },
   "repository": {
     "type": "git",
@@ -28,6 +30,7 @@
   },
   "homepage": "https://github.com/raihara3/virtual-koten#readme",
   "dependencies": {
+    "@types/web-bluetooth": "^0.0.9",
     "husky": "^4.3.0",
     "three": "^0.121.1",
     "ts-loader": "^8.0.11",
