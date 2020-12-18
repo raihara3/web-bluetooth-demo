@@ -10,14 +10,13 @@
     "webpack": "webpack --config webpack.config.js --mode development",
     "start": "run-p webpack build-scss watch-scss webpackdevserver",
     "precommit": "yarn run eslint .eslintrc",
-    "webpackdevserver": "webpack-dev-server --https",
-    "create-ssl-certificate": "run-s create-ca-privatekey create-ca-csr create-ca-crt create-server-privatekey create-server-csr create-server-crt",
-    "create-ca-privatekey": "openssl genrsa -out ca-privatekey.pem 2048",
-    "create-ca-csr": "openssl req -new -key ca-privatekey.pem -out ca-csr.pem",
-    "create-ca-crt": "openssl req -x509 -key ca-privatekey.pem -in ca-csr.pem -out ca-crt.pem -days 3560",
-    "create-server-privatekey": "openssl genrsa -out server-privatekey.pem",
-    "create-server-csr": "openssl req -new -key server-privatekey.pem -out server-csr.pem",
-    "create-server-crt": "openssl x509 -req -CA ca-crt.pem -CAkey ca-privatekey.pem -CAcreateserial -in server-csr.pem -out server-crt.pem -days 3650"
+    "webpackdevserver": "webpack-dev-server --https --cert key/localhost.crt --key key/localhost.key",
+    "setting-ssl": "run-s create-my-key create-my-certificate create-server-key create-server-csr create-server-crt",
+    "create-my-key": "openssl genrsa -des3 -out key/myCA.key 2048",
+    "create-my-certificate": "openssl req -x509 -new -nodes -key key/myCA.key -sha256 -days 1825 -out key/myCA.pem",
+    "create-server-key": "openssl genrsa -out key/localhost.key 2048",
+    "create-server-csr": "openssl req -new -key key/localhost.key -out key/localhost.csr",
+    "create-server-crt": "openssl x509 -req -in key/localhost.csr -CA key/myCA.pem -CAkey key/myCA.key -CAcreateserial -out key/localhost.crt -days 1825 -sha256 -extfile localhost.ext"
   },
   "repository": {
     "type": "git",
