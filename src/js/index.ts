@@ -1,36 +1,69 @@
-let deviceName = ''
+/*
+  RSSI = TxPower - 20 * lg(d)
+  d = 10 ^ ((TxPower - RSSI) / 20)
+*/
 
-const pairing = async () => {
-  const bluetooth = window.navigator.bluetooth
-  const device = await bluetooth.requestDevice({
-    acceptAllDevices: true
-  })
-  console.debug(`name: ${device.name} ,id: ${device.id}`)
-  deviceName = device.name ? device.name : ''
-}
+class WebBluetooth {
+  deviceName: string
+  bluetooth: Bluetooth
+  dom: HTMLElement | null
 
-const main = async () => {
-  const bluetooth = window.navigator.bluetooth
+  constructor() {
+    this.deviceName = ''
+    this.bluetooth = window.navigator.bluetooth
+    this.dom = document.getElementById('web-bluetooth')
+  }
 
-  await bluetooth.requestLEScan({
-    acceptAllAdvertisements: true
-  })
-
-  bluetooth.addEventListener('advertisementreceived', event => {
-    if(deviceName === event.device.name) {
-      const d = Math.pow(10.0, (event.txPower - (event.rssi)) / 17.0)
-
-      const distance = document.getElementById('distance')
-      if(distance) {
-        distance.innerText = `${event.device.name}までの距離は${Math.round(d / 100)}cm`
-      }
+  isSupported() {
+    if(!this.dom) {
+      alert('There is no web-bluetooth dom.')
+      return false
     }
-  })
+
+    if(!this.bluetooth) {
+      this.dom.innerText = 'not supported.'
+      return false
+    }
+
+    const button = document.createElement('button')
+    button.innerText = 'Pairing'
+    button.addEventListener('click', () => this.pairing())
+    this.dom.appendChild(button)
+    return true
+  }
+
+  async pairing() {
+    const device = await this.bluetooth.requestDevice({
+      acceptAllDevices: true
+    })
+    if(!device) return
+
+    if(device.name) this.deviceName = device.name
+
+    const button = document.createElement('button')
+    button.innerText = 'Get Distance'
+    button.addEventListener('click', () => this.getDistance())
+    if(this.dom) this.dom.appendChild(button)
+
+    console.debug(`name: ${device.name} , id: ${device.id}`)
+  }
+
+  async getDistance() {
+    await this.bluetooth.requestLEScan({
+      acceptAllAdvertisements: true
+    })
+
+    const div = document.createElement('div')
+    if(this.dom) this.dom.appendChild(div)
+
+    this.bluetooth.addEventListener('advertisementreceived', event => {
+      if(this.deviceName !== event.device.name) return
+
+      const distance = Math.pow(10.0, (event.txPower - (event.rssi)) / 17.0)
+      div.innerText = `${event.device.name}までの距離は${Math.round(distance / 100)}cm`
+    })
+  }
 }
 
-const pairingButton = document.getElementById('pairing')
-const button = document.getElementById('bluetooth')
-if(pairingButton && button) {
-  pairingButton.addEventListener('click', pairing)
-  button.addEventListener('click', main)
-}
+const webBluetooth = new WebBluetooth()
+const isSupported = webBluetooth.isSupported()
