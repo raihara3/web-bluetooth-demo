@@ -26,7 +26,7 @@ class WebBluetooth {
     }
 
     const button = document.createElement('button')
-    button.innerText = 'Pairing'
+    button.innerText = '1. Pairing'
     button.addEventListener('click', () => this.pairing())
     this.dom.appendChild(button)
     return true
@@ -41,7 +41,7 @@ class WebBluetooth {
     if(device.name) this.deviceName = device.name
 
     const button = document.createElement('button')
-    button.innerText = 'Get Distance'
+    button.innerText = '2. Get Distance'
     button.addEventListener('click', () => this.getDistance())
     if(this.dom) this.dom.appendChild(button)
 
