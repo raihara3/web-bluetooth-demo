@@ -7,3 +7,5 @@ Then enable the [Experimental Web Platform features](chrome://flags/#enable-expe
 
 Then give it a try!  
 https://raihara3.github.io/web-bluetooth-demo/dist/
+
+<img src="https://user-images.githubusercontent.com/47589307/109393275-03a88b80-7964-11eb-8be2-07d913cfc336.png" width=300>
